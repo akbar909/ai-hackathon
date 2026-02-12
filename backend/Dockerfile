@@ -16,12 +16,22 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
-COPY . .
+# Create a non-root user (required by Hugging Face Spaces)
+RUN useradd -m -u 1000 user
 
-# Expose port (Render sets PORT env var, but we document 8000)
-EXPOSE 8000
+# Copy the rest of the application with correct permissions
+COPY --chown=user . .
 
-# Command to run the application
-# Use host 0.0.0.0 to allow external access
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Ensure permissions for all directories (especially for writing models/data)
+RUN mkdir -p /app/ml /app/data && chown -R user:user /app
+
+# Switch to the non-root user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
+
+# Expose port 7860 (Hugging Face default)
+EXPOSE 7860
+
+# Command to run the application on port 7860
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
