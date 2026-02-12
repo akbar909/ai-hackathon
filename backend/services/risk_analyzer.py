@@ -94,15 +94,10 @@ class RiskAnalyzer:
         # Calculate weighted average risk (0-10 scale)
         if total_distance > 0:
             avg_risk = weighted_risk_sum / total_distance
-            # Scale it up slightly to be more sensitive to risk (since usually risk is sparse)
-            # Or keep it raw if we want true average
-            # User wants to distinguish routes. 
-            # If 10% of route is risk 10, avg is 1. That's Low. 
-            # This seems fair. A mostly safe route with one bad spot is generally safe-ish?
-            # Or should we use Max Risk Encountered as a component?
-            # Let's use Average + (Max Risk / 2) to penalize ANY high risk?
-            # For now, let's stick to Average adjusted.
-            normalized_risk = min(avg_risk * 2.0, 10.0) # Boost factor to make risks visible
+            # Use the raw average risk.
+            # Previously we multiplied by 2.0, which made medium risks (5/10) count as critical (10/10).
+            # Now we keep it 1:1, so 5/10 risk = 50% safety, which is more reasonable.
+            normalized_risk = min(avg_risk, 10.0)
         else:
             normalized_risk = 0.0
         

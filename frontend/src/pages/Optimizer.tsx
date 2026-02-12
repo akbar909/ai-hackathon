@@ -14,6 +14,7 @@ const Optimizer: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [result, setResult] = useState<RouteResponse | null>(null);
     const [riskZones, setRiskZones] = useState<RiskZone[]>([]);
+    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
     // Load risk zones on mount
     useEffect(() => {
@@ -31,6 +32,7 @@ const Optimizer: React.FC = () => {
     const handleOptimize = async (request: DeliveryRequest) => {
         setIsLoading(true);
         setError(null);
+        setFormErrors({});
         setResult(null);
 
         try {
@@ -60,6 +62,31 @@ const Optimizer: React.FC = () => {
                 }
             } else if (err.message) {
                 errorMessage = err.message;
+            }
+
+            // Custom advice for geocoding errors
+            if (errorMessage.toLowerCase().includes('geocode') || errorMessage.toLowerCase().includes('not found')) {
+                const tip = ' 💡 Tip: Try adding the city and country (e.g., "Saddar, Hyderabad, Pakistan")';
+                errorMessage += tip;
+
+                // Map error to specific field if possible
+                const newFormErrors: Record<string, string> = {};
+
+                if (request.start_location && errorMessage.includes(request.start_location)) {
+                    newFormErrors.startLocation = 'Address not found. ' + tip;
+                }
+
+                request.stops.forEach((stop, index) => {
+                    if (stop.address && errorMessage.includes(stop.address)) {
+                        newFormErrors[`stop_${index}`] = 'Address not found. ' + tip;
+                    }
+                });
+
+                if (Object.keys(newFormErrors).length > 0) {
+                    setFormErrors(newFormErrors);
+                    // Scroll to top to see form errors
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             }
 
             setError(errorMessage);
@@ -94,7 +121,7 @@ const Optimizer: React.FC = () => {
                         transition={{ delay: 0.1 }}
                         className="lg:col-span-1"
                     >
-                        <DeliveryForm onSubmit={handleOptimize} isLoading={isLoading} />
+                        <DeliveryForm onSubmit={handleOptimize} isLoading={isLoading} errors={formErrors} />
                     </motion.div>
 
                     {/* Right Column - Map */}

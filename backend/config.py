@@ -18,11 +18,11 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     
     # MongoDB
-    mongodb_url: str = "mongodb+srv://RecipeSharingApp:RecipeSharingApp@cluster0.nakwd.mongodb.net/ai-hackathon?retryWrites=true&w=majority&appName=Cluster0"
+    mongodb_url: str = ""
     mongodb_db: str = "ai-hackathon"
     
     # JWT Authentication
-    jwt_secret: str = "I1So/IBxFezC+0SMQs/EQi/x2q2h3Z4TOt2sMSzNxpo="
+    jwt_secret: str = ""
     jwt_algorithm: str = "HS256"
     jwt_expiry_hours: int = 72
     

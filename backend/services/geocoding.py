@@ -41,6 +41,33 @@ class GeocodingService:
             
             "Hyderabad, Pakistan": (25.3960, 68.3578),
             "hyderabad": (25.3960, 68.3578),
+
+            # Major Cities Fallbacks
+            "Karachi, Pakistan": (24.8607, 67.0011),
+            "karachi": (24.8607, 67.0011),
+            "karachi, sindh": (24.8607, 67.0011),
+
+            "Lahore, Pakistan": (31.5204, 74.3587),
+            "lahore": (31.5204, 74.3587),
+            "lahore, punjab": (31.5204, 74.3587),
+
+            "Islamabad, Pakistan": (33.6844, 73.0479),
+            "islamabad": (33.6844, 73.0479),
+
+            "Rawalpindi, Pakistan": (33.5651, 73.0169),
+            "rawalpindi": (33.5651, 73.0169),
+
+            "Peshawar, Pakistan": (34.0151, 71.5249),
+            "peshawar": (34.0151, 71.5249),
+
+            "Quetta, Pakistan": (30.1798, 66.9750),
+            "quetta": (30.1798, 66.9750),
+
+            "Multan, Pakistan": (30.1575, 71.5249),
+            "multan": (30.1575, 71.5249),
+
+            "Faisalabad, Pakistan": (31.4504, 73.1350),
+            "faisalabad": (31.4504, 73.1350),
         }
     
     def geocode_address(self, address: str, retry_count: int = 3) -> Optional[Tuple[float, float]]:
@@ -74,8 +101,15 @@ class GeocodingService:
         
         # Try Nominatim geocoding with variations
         search_queries = [address]
-        if "pakistan" not in address.lower():
+        
+        # Add country context if missing
+        lower_addr = address.lower()
+        if "pakistan" not in lower_addr:
             search_queries.append(f"{address}, Pakistan")
+            
+        # Add specific city-country format if it looks like a single city name
+        if "," not in address and "pakistan" not in lower_addr:
+            search_queries.append(f"{address.title()}, Pakistan")
             
         for query in search_queries:
             for attempt in range(retry_count):

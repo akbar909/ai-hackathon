@@ -1,4 +1,4 @@
-import { AlertTriangle, Clock, DollarSign, TrendingDown } from 'lucide-react';
+import { AlertTriangle, Banknote, Clock, TrendingDown } from 'lucide-react';
 import React from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { CostPrediction, RiskAnalysis } from '../types';
@@ -53,7 +53,7 @@ const CostDashboard: React.FC<CostDashboardProps> = ({ cost, risk, distance, tim
 
     };
 
-    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }: any) => {
+    const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, percent, name }: any) => {
         const RADIAN = Math.PI / 180;
         const radius = outerRadius * 1.25;
         const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -73,7 +73,7 @@ const CostDashboard: React.FC<CostDashboardProps> = ({ cost, risk, distance, tim
                 {/* Total Cost */}
                 <div className="glass-card p-5 hover-lift">
                     <div className="flex items-center justify-between mb-2">
-                        <DollarSign className="w-8 h-8 text-success" />
+                        <Banknote className="w-8 h-8 text-success" />
                         <span className="text-xs text-gray-400">Predicted</span>
                     </div>
                     <div className="text-3xl font-bold text-success">
@@ -172,7 +172,6 @@ const CostDashboard: React.FC<CostDashboardProps> = ({ cost, risk, distance, tim
                                     data={riskZoneData}
                                     cx="50%"
                                     cy="50%"
-                                    labelLine={false}
                                     labelLine={true}
                                     label={renderCustomizedLabel}
                                     outerRadius={80}
@@ -188,7 +187,6 @@ const CostDashboard: React.FC<CostDashboardProps> = ({ cost, risk, distance, tim
                                         background: 'rgba(26, 26, 26, 0.95)',
                                         border: '1px solid rgba(255,255,255,0.1)',
                                         borderRadius: '8px',
-                                        color: '#fff',
                                         color: '#fff',
                                     }}
                                     itemStyle={{ color: '#fff' }}

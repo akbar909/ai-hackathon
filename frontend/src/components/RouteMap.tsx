@@ -65,13 +65,6 @@ const RouteMap: React.FC<RouteMapProps> = ({ route, riskZones, showRiskZones = t
         }
     }, [route]);
 
-    const getRiskColor = (riskLevel: number): string => {
-        if (riskLevel <= 3) return '#10b981';
-        if (riskLevel <= 5) return '#f59e0b';
-        if (riskLevel <= 7) return '#fb923c';
-        return '#ef4444';
-    };
-
     const getZoneColor = (zoneType: string): string => {
         switch (zoneType) {
             case 'construction': return '#f59e0b';

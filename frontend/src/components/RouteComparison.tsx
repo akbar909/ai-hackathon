@@ -173,7 +173,6 @@ const getDifferenceText = (
 
     const isWorse = lowerIsBetter ? diff > 0 : diff > 0;
     const prefix = isWorse ? '+' : '';
-    const color = isWorse ? 'text-danger' : 'text-success';
 
     return `${prefix}${absDiff.toFixed(1)}${unit}`;
 };

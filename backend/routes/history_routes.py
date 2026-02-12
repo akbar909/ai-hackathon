@@ -34,6 +34,41 @@ async def get_history(current_user: dict = Depends(get_current_user)):
     return {"history": history}
 
 
+@router.get("/history/{history_id}")
+async def get_history_detail(history_id: str, current_user: dict = Depends(get_current_user)):
+    """Get full details of a specific route optimization"""
+    db = get_db()
+    
+    try:
+        doc = await db.history.find_one({
+            "_id": ObjectId(history_id),
+            "user_id": current_user["user_id"],
+        })
+    except Exception:
+        return {"error": "Invalid ID format"}
+    
+    if not doc:
+        return {"error": "Optimization not found"}
+    
+    result = {
+        "id": str(doc["_id"]),
+        "start_location": doc.get("start_location", ""),
+        "num_stops": doc.get("num_stops", 0),
+        "total_distance_km": doc.get("total_distance_km", 0),
+        "total_time_min": doc.get("total_time_min", 0),
+        "predicted_cost": doc.get("predicted_cost", 0),
+        "risk_score": doc.get("risk_score", 0),
+        "quality_score": doc.get("quality_score", 0),
+        "created_at": doc.get("created_at", datetime.utcnow()).isoformat(),
+        "has_full_details": "full_details" in doc,
+    }
+    
+    if "full_details" in doc:
+        result["full_details"] = doc["full_details"]
+    
+    return result
+
+
 @router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     """Get dashboard statistics for current user"""

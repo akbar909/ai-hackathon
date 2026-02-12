@@ -1,13 +1,14 @@
-import { MapPin, Plus, Truck, X, Zap } from 'lucide-react';
+import { AlertCircle, MapPin, Plus, Truck, X, Zap } from 'lucide-react';
 import React, { useState } from 'react';
 import type { DeliveryRequest, DeliveryStop, VehicleInfo } from '../types';
 
 interface DeliveryFormProps {
     onSubmit: (request: DeliveryRequest) => void;
     isLoading: boolean;
+    errors?: Record<string, string>;
 }
 
-const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit, isLoading }) => {
+const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit, isLoading, errors = {} }) => {
     const [startLocation, setStartLocation] = useState('Saddar, Hyderabad, Sindh, Pakistan');
     const [stops, setStops] = useState<DeliveryStop[]>([
         { address: 'Latifabad, Hyderabad, Sindh, Pakistan', priority: 1 },
@@ -16,6 +17,21 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit, isLoading }) => {
     const [fuelEfficiency, setFuelEfficiency] = useState(22);
     const [avoidPeakHours, setAvoidPeakHours] = useState(true);
     const [prioritizeSafety, setPrioritizeSafety] = useState(false);
+
+    // Auto-update MPG based on vehicle type
+    React.useEffect(() => {
+        const defaults: Record<string, number> = {
+            car: 25,
+            van: 18,
+            truck: 8,
+            motorcycle: 50,
+            scooter: 45,
+            'mini-truck': 15
+        };
+        if (defaults[vehicleType]) {
+            setFuelEfficiency(defaults[vehicleType]);
+        }
+    }, [vehicleType]);
 
     const addStop = () => {
         setStops([...stops, { address: '', priority: 1 }]);
@@ -71,10 +87,20 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit, isLoading }) => {
                     type="text"
                     value={startLocation}
                     onChange={(e) => setStartLocation(e.target.value)}
-                    className="input-field w-full"
-                    placeholder="Enter starting address"
+                    className={`input-field w-full ${errors.startLocation ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                    placeholder="e.g., Tower Market, Hyderabad, Pakistan"
                     required
+                    minLength={5}
                 />
+                <div className="flex justify-between items-start mt-1">
+                    <p className="text-xs text-gray-500">Include city and country for best results</p>
+                    {errors.startLocation && (
+                        <p className="text-xs text-red-400 flex items-start gap-1 font-medium">
+                            <AlertCircle className="w-3 h-3 mt-0.5" />
+                            {errors.startLocation}
+                        </p>
+                    )}
+                </div>
             </div>
 
             {/* Delivery Stops */}
@@ -92,22 +118,29 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit, isLoading }) => {
                 </div>
                 <div className="space-y-2">
                     {stops.map((stop, index) => (
-                        <div key={index} className="flex gap-2">
+                        <div key={index} className="flex gap-2 items-start">
                             <div className="flex-1">
                                 <input
                                     type="text"
                                     value={stop.address}
                                     onChange={(e) => updateStop(index, e.target.value)}
-                                    className="input-field w-full"
-                                    placeholder={`Stop ${index + 1} address`}
+                                    className={`input-field w-full ${errors[`stop_${index}`] ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                                    placeholder={`Stop ${index + 1} e.g., Auto Bahn Road, Hyderabad`}
                                     required
+                                    minLength={5}
                                 />
+                                {errors[`stop_${index}`] && (
+                                    <p className="text-xs text-red-400 mt-1 pl-1 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3 h-3" />
+                                        {errors[`stop_${index}`]}
+                                    </p>
+                                )}
                             </div>
                             {stops.length > 1 && (
                                 <button
                                     type="button"
                                     onClick={() => removeStop(index)}
-                                    className="glass p-2 rounded-lg hover:bg-danger/20 transition-colors"
+                                    className="glass p-2 rounded-lg hover:bg-danger/20 transition-colors mt-[1px]" // align with input
                                 >
                                     <X className="w-5 h-5 text-danger" />
                                 </button>
@@ -190,7 +223,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit, isLoading }) => {
                     </>
                 )}
             </button>
-        </form>
+        </form >
     );
 };
 

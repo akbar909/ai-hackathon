@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import {
-    Activity, ArrowRight, Calendar, DollarSign,
-    Map, Route, Shield, TrendingUp, Zap
+    Activity, ArrowRight, Banknote,
+    Calendar,
+    Eye, Map, Route, Shield, TrendingUp, Zap
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -33,6 +34,7 @@ interface HistoryItem {
 
 const Dashboard: React.FC = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [history, setHistory] = useState<HistoryItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -82,12 +84,12 @@ const Dashboard: React.FC = () => {
         {
             label: 'Cost Predicted',
             value: `PKR ${(stats?.total_cost || 0).toFixed(0)}`,
-            icon: <DollarSign className="w-6 h-6 text-purple-400" />,
+            icon: <Banknote className="w-6 h-6 text-purple-400" />,
             bg: 'bg-purple-500/10',
         },
         {
             label: 'Avg Safety Score',
-            value: `${(100 - (stats?.avg_risk_score || 0) * 10).toFixed(0)}%`,
+            value: `${(100 - (stats?.avg_risk_score || 0) * 9).toFixed(0)}%`,
             icon: <Shield className="w-6 h-6 text-orange-400" />,
             bg: 'bg-orange-500/10',
         },
@@ -212,7 +214,7 @@ const Dashboard: React.FC = () => {
                         className="glass-card p-6"
                     >
                         <div className="flex items-center gap-2 mb-6">
-                            <DollarSign className="w-5 h-5 text-purple-400" />
+                            <Banknote className="w-5 h-5 text-purple-400" />
                             <h3 className="text-lg font-semibold">Cost Analysis</h3>
                         </div>
                         {stats?.recent_routes && stats.recent_routes.length > 0 ? (
@@ -241,7 +243,7 @@ const Dashboard: React.FC = () => {
                         ) : (
                             <div className="h-[250px] flex items-center justify-center">
                                 <div className="text-center">
-                                    <DollarSign className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                                    <Banknote className="w-12 h-12 text-gray-600 mx-auto mb-3" />
                                     <p className="text-gray-500">No cost data yet</p>
                                     <p className="text-gray-600 text-sm mt-1">Start optimizing to see cost analysis</p>
                                 </div>
@@ -270,7 +272,7 @@ const Dashboard: React.FC = () => {
                         </div>
                     </Link>
 
-                    <div className="glass-card p-6 hover:bg-white/5 transition-all group">
+                    <Link to="/risk-zones" className="glass-card p-6 hover:bg-white/5 transition-all group cursor-pointer">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
                                 <Shield className="w-6 h-6 text-green-400" />
@@ -279,8 +281,9 @@ const Dashboard: React.FC = () => {
                                 <h4 className="font-semibold">View Risk Zones</h4>
                                 <p className="text-sm text-gray-400">Safety analysis</p>
                             </div>
+                            <ArrowRight className="w-5 h-5 text-gray-600 ml-auto group-hover:text-white group-hover:translate-x-1 transition-all" />
                         </div>
-                    </div>
+                    </Link>
 
                     <div className="glass-card p-6 hover:bg-white/5 transition-all group">
                         <div className="flex items-center gap-4">
@@ -325,11 +328,12 @@ const Dashboard: React.FC = () => {
                                             <span className="ml-1 text-gray-600 cursor-help" title="Composite score based on distance, cost, and risk factors">?</span>
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">View</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
                                     {history.map((item) => (
-                                        <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                                        <tr key={item.id} className="hover:bg-white/5 transition-colors cursor-pointer" onClick={() => navigate(`/history/${item.id}`)}>
                                             <td className="px-6 py-4 text-sm max-w-[200px] truncate">{item.start_location}</td>
                                             <td className="px-6 py-4 text-sm">
                                                 <span className="bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md text-xs font-medium">
@@ -352,6 +356,15 @@ const Dashboard: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-400">
                                                 {new Date(item.created_at).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); navigate(`/history/${item.id}`); }}
+                                                    className="p-2 rounded-lg hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 transition-all"
+                                                    title="View Details"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

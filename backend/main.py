@@ -356,6 +356,15 @@ async def optimize_route(request: DeliveryRequest, current_user: dict = Depends(
                     "risk_score": risk_analysis["total_risk_score"],
                     "quality_score": round(quality_score, 1),
                     "created_at": datetime.utcnow(),
+                    # Full details for history view
+                    "full_details": {
+                        "primary_route": response.primary_route.model_dump(),
+                        "cost_prediction": response.cost_prediction.model_dump(),
+                        "risk_analysis": risk_analysis,
+                        "alternatives": [alt.model_dump() for alt in response.alternatives],
+                        "explanation": response.explanation.model_dump() if response.explanation else None,
+                        "processing_time_ms": response.processing_time_ms,
+                    },
                 })
                 logger.info(f"Saved optimization to history for user {current_user['user_id']}")
             except Exception as e:

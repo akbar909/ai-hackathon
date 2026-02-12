@@ -46,4 +46,9 @@ export const getRiskZones = async (): Promise<RiskZone[]> => {
     return response.data.risk_zones;
 };
 
+export const getHistoryDetail = async (id: string) => {
+    const response = await api.get(`/api/history/${id}`);
+    return response.data;
+};
+
 export default api;

@@ -1,14 +1,17 @@
 import { Home as HomeIcon, LayoutDashboard, LogIn, LogOut, Menu, Truck, UserPlus, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Logo from './components/Logo';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './index.css';
 import Dashboard from './pages/Dashboard';
+import HistoryDetails from './pages/HistoryDetails';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Optimizer from './pages/Optimizer';
 import Register from './pages/Register';
+import RiskZones from './pages/RiskZones';
 
 function Navbar() {
     const { isAuthenticated, user, logout } = useAuth();
@@ -35,11 +38,8 @@ function Navbar() {
             <nav className="bg-[#0d0d0d]/90 backdrop-blur-xl border-b border-white/10 sticky top-0 z-[9999]">
                 <div className="container mx-auto px-4 sm:px-6 py-4">
                     <div className="flex items-center justify-between">
-                        <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                <Truck className="w-6 h-6 text-white" />
-                            </div>
-                            <span className="text-xl font-bold">AI Logistics</span>
+                        <Link to="/" className="hover:opacity-80 transition-opacity">
+                            <Logo />
                         </Link>
 
                         {/* Desktop Nav */}
@@ -194,6 +194,15 @@ function AppContent() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/history/:id"
+                        element={
+                            <ProtectedRoute>
+                                <HistoryDetails />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route path="/risk-zones" element={<RiskZones />} />
                 </Routes>
             </main>
 
