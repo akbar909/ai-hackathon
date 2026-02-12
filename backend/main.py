@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from models import (
     DeliveryRequest, RouteResponse, OptimizedRoute, CostPrediction,
     AlternativeRoute, RouteExplanation, RouteSegment, Coordinates
@@ -14,25 +15,44 @@ from services.explainer import explainer_service
 from services.osrm_router import osrm_router
 from config import settings
 from utils.logger import setup_logger
+from database import connect_db, close_db, get_db
+from auth import get_optional_user
+from routes.auth_routes import router as auth_router
+from routes.history_routes import router as history_router
 import time
 import uuid
+from datetime import datetime
 
 logger = setup_logger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup and shutdown lifecycle"""
+    await connect_db()
+    yield
+    await close_db()
+
 
 app = FastAPI(
     title="AI Logistics Route Optimizer",
     description="Optimize delivery routes with AI-powered cost prediction and risk analysis",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan,
 )
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url, "http://localhost:5173"],
+    allow_origins=[settings.frontend_url, "http://localhost:5173", "http://localhost:5174"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(auth_router)
+app.include_router(history_router)
 
 
 @app.get("/")
@@ -57,7 +77,7 @@ async def get_risk_zones():
 
 
 @app.post("/api/optimize", response_model=RouteResponse)
-async def optimize_route(request: DeliveryRequest):
+async def optimize_route(request: DeliveryRequest, current_user: dict = Depends(get_optional_user)):
     """
     Main route optimization endpoint.
     
@@ -321,6 +341,25 @@ async def optimize_route(request: DeliveryRequest):
             explanation=explanation,
             processing_time_ms=round(processing_time_ms, 2)
         )
+        
+        # Save to history if user is authenticated
+        if current_user:
+            try:
+                db = get_db()
+                await db.history.insert_one({
+                    "user_id": current_user["user_id"],
+                    "start_location": request.start_location,
+                    "num_stops": len(request.stops),
+                    "total_distance_km": round(total_distance, 2),
+                    "total_time_min": round(total_time_min, 1),
+                    "predicted_cost": cost_prediction["predicted_cost_usd"],
+                    "risk_score": risk_analysis["total_risk_score"],
+                    "quality_score": round(quality_score, 1),
+                    "created_at": datetime.utcnow(),
+                })
+                logger.info(f"Saved optimization to history for user {current_user['user_id']}")
+            except Exception as e:
+                logger.warning(f"Failed to save history: {e}")
         
         return response
         

@@ -416,7 +416,7 @@ MIT License - see LICENSE file for details
 
 For issues or questions:
 - Open a GitHub issue
-- Email: support@ailogistics.example.com
+- Email: jamaliakbar909@gmail.com
 
 ---
 

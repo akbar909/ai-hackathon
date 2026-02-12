@@ -1,5 +1,4 @@
 import axios from 'axios';
-import type { DeliveryRequest, RiskZone, RouteResponse } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000';
 
@@ -8,8 +7,34 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 120000, // 2 minutes for route optimization
+    timeout: 120000,
 });
+
+// Add token from localStorage on initialization
+const token = localStorage.getItem('token');
+if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
+
+// Response interceptor for 401 handling
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Token expired or invalid
+            localStorage.removeItem('token');
+            delete api.defaults.headers.common['Authorization'];
+            // Don't redirect if already on auth pages
+            if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
+// Route optimization APIs
+import type { DeliveryRequest, RiskZone, RouteResponse } from '../types';
 
 export const optimizeRoute = async (request: DeliveryRequest): Promise<RouteResponse> => {
     const response = await api.post<RouteResponse>('/api/optimize', request);

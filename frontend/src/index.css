@@ -149,6 +149,8 @@ select.input-field option {
 .leaflet-container {
   @apply rounded-xl;
   background: #1a1a1a;
+  z-index: 0 !important;
+  position: relative;
 }
 
 .leaflet-popup-content-wrapper {
