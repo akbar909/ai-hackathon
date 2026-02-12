@@ -1,0 +1,90 @@
+[
+  {
+    "id": "hyd_construction_1",
+    "name": "Auto Bahn Road Construction",
+    "zone_type": "construction",
+    "center": {
+      "lat": 25.3960,
+      "lng": 68.3578
+    },
+    "radius_km": 0.8,
+    "risk_level": 3
+  },
+  {
+    "id": "hyd_accident_1",
+    "name": "Hyderabad Bypass Accident Zone",
+    "zone_type": "accident",
+    "center": {
+      "lat": 25.3854,
+      "lng": 68.3655
+    },
+    "radius_km": 1.2,
+    "risk_level": 4
+  },
+  {
+    "id": "hyd_congestion_1",
+    "name": "Saddar Bazaar Traffic",
+    "zone_type": "congestion",
+    "center": {
+      "lat": 25.3782,
+      "lng": 68.3642
+    },
+    "radius_km": 0.6,
+    "risk_level": 4
+  },
+  {
+    "id": "hyd_construction_2",
+    "name": "Latifabad Unit Road Work",
+    "zone_type": "construction",
+    "center": {
+      "lat": 25.3624,
+      "lng": 68.3462
+    },
+    "radius_km": 0.7,
+    "risk_level": 2
+  },
+  {
+    "id": "hyd_congestion_2",
+    "name": "Qasimabad Market Area",
+    "zone_type": "congestion",
+    "center": {
+      "lat": 25.4112,
+      "lng": 68.3889
+    },
+    "radius_km": 0.5,
+    "risk_level": 3
+  },
+  {
+    "id": "hyd_accident_2",
+    "name": "Kohsar Chowk Intersection",
+    "zone_type": "accident",
+    "center": {
+      "lat": 25.3895,
+      "lng": 68.3721
+    },
+    "radius_km": 0.4,
+    "risk_level": 3
+  },
+  {
+    "id": "hyd_congestion_3",
+    "name": "Hyder Chowk Area",
+    "zone_type": "congestion",
+    "center": {
+      "lat": 25.3701,
+      "lng": 68.3581
+    },
+    "radius_km": 0.8,
+    "risk_level": 4
+  },
+  {
+    "id": "hyd_crime_1",
+    "name": "High Crime Area - Avoid Night",
+    "zone_type": "crime",
+    "center": {
+      "lat": 25.3455,
+      "lng": 68.3398
+    },
+    "radius_km": 1.0,
+    "risk_level": 5
+  }
+]
