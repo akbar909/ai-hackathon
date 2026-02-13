@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Logo from './components/Logo';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './index.css';
 import Dashboard from './pages/Dashboard';
@@ -225,6 +226,7 @@ function AppContent() {
 function App() {
     return (
         <Router>
+            <ScrollToTop />
             <AuthProvider>
                 <AppContent />
             </AuthProvider>
